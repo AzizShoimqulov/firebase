@@ -2,51 +2,67 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Firebase Example</title>
-  <script type="module">
-    // Firebase kutubxonalarini import qilish
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+  <title>Firebase One Script Example</title>
 
-    // Firebase konfiguratsiyasi (Firebase Console’dan olasiz)
-    const firebaseConfig = {
-      apiKey: "API_KEY",
-      authDomain: "PROJECT_ID.firebaseapp.com",
-      projectId: "PROJECT_ID",
-      storageBucket: "PROJECT_ID.appspot.com",
-      messagingSenderId: "SENDER_ID",
-      appId: "APP_ID"
-    };
-
-    // Firebase’ni ishga tushirish
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Foydalanuvchi ro‘yxatdan o‘tkazish
-    async function registerUser() {
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, "test@mail.com", "123456");
-        console.log("Foydalanuvchi:", userCredential.user);
-
-        // Firestore’ga foydalanuvchi ma’lumotini saqlash
-        await addDoc(collection(db, "users"), {
-          email: userCredential.user.email,
-          createdAt: new Date()
-        });
-
-        console.log("Firestore’ga saqlandi ✅");
-      } catch (error) {
-        console.error("Xato:", error.message);
-      }
-    }
-
-    // Sahifa yuklanganda avtomatik ishga tushadi
-    registerUser();
-  </script>
+  <!-- Firebase asosiy kutubxonalar -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
-  <h1>Firebase JS bilan ishlamoqda 🚀</h1>
+  <h1>Firebase (Oddiy HTML + JS) 🚀</h1>
+
+  <button onclick="registerUser()">Sign Up</button>
+  <button onclick="loginUser()">Login</button>
+  <button onclick="getUsers()">Get Users</button>
+
+  <script>
+    // ✅ Firebase konfiguratsiyasi (o‘zingizniki bilan almashtiring)
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6iQgsC5__ohVOQydaMkVHKaspx8eE_Tw",
+      authDomain: "web-app-4ac54.firebaseapp.com",
+      projectId: "web-app-4ac54",
+      storageBucket: "web-app-4ac54.firebasestorage.app",
+      messagingSenderId: "1006563534990",
+      appId: "1:1006563534990:web:3a573d111fe073df65c1df",
+      measurementId: "G-9VKYF5CKNZ"
+    };
+
+    // Firebase ishga tushirish
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔹 Ro‘yxatdan o‘tkazish
+    function registerUser() {
+      auth.createUserWithEmailAndPassword("test@mail.com", "123456")
+        .then(user => {
+          console.log("✅ Ro‘yxatdan o‘tdi:", user.user.email);
+          // Firestore’ga yozish
+          return db.collection("users").add({
+            email: user.user.email,
+            createdAt: new Date()
+          });
+        })
+        .then(() => console.log("✅ Firestore’ga yozildi!"))
+        .catch(err => console.error("❌ Xato:", err.message));
+    }
+
+    // 🔹 Login qilish
+    function loginUser() {
+      auth.signInWithEmailAndPassword("test@mail.com", "123456")
+        .then(user => console.log("✅ Login bo‘ldi:", user.user.email))
+        .catch(err => console.error("❌ Xato:", err.message));
+    }
+
+    // 🔹 Foydalanuvchilarni olish
+    function getUsers() {
+      db.collection("users").get().then(snapshot => {
+        snapshot.forEach(doc => {
+          console.log(doc.id, "=>", doc.data());
+        });
+      });
+    }
+  </script>
 </body>
 </html>
